@@ -1,0 +1,8 @@
+Car;Ford;Mustang;2015;25000;false;1;
+Motorcycle;Harley-Davidson;Street 750;2018;15000;Sport;false;2
+Car;Toyota;Camry;2017;20000;false;3;
+Motorcycle;Yamaha;YZF-R1;2020;18000;Sport;false;4
+Car;Chevrolet;Impala;2016;21000;false;5;
+Motorcycle;Honda;CBR600RR;2019;12000;Sport;false;6
+Motorcycle;Honda;CBR600RR;2019;12000;Fire;false;7
+Car;Chevrolet;Impala;2016;21000;false;8;
