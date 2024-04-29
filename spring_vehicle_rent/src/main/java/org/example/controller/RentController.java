@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rents")
 @RequiredArgsConstructor
 public class RentController {
-
     private final RentService rentService;
 
     @PostMapping(value = "/rent")

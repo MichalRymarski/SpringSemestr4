@@ -14,7 +14,6 @@ import java.util.Collection;
 @Repository
 public class UserDAO implements IUserRepository {
     private static UserDAO instance;
-
     SessionFactory sessionFactory;
 
     @Autowired
@@ -40,20 +39,24 @@ public class UserDAO implements IUserRepository {
     }
 
     @Override
-    public void addUser(User user) {
+    public boolean addUser(User user) {
             Session session = sessionFactory.openSession();
             Transaction transaction = null;
+            boolean success = false;
             try {
                 transaction = session.beginTransaction();
                 session.persist(user);
                 transaction.commit();
+                success = true;
             } catch (RuntimeException e) {
                 if (transaction != null) {
+                    success= false;
                     transaction.rollback();
                 }
                 e.printStackTrace();
             } finally {
                 session.close();
+                return  success;
             }
     }
 

@@ -3,6 +3,8 @@ package org.example.service;
 import lombok.RequiredArgsConstructor;
 import org.example.dao.IUserRepository;
 import org.example.dao.IVehicleRepository;
+import org.example.dao.hibernate.UserDAO;
+import org.example.dao.hibernate.VehicleDAO;
 import org.example.model.User;
 import org.example.model.Vehicle;
 import org.springframework.stereotype.Service;
@@ -11,9 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RentService {
 
-    private final IUserRepository userRepository;
+    private final UserDAO userRepository;
 
-    private final IVehicleRepository vehicleRepository;
+    private final VehicleDAO vehicleRepository;
 
     public boolean rentVehicle(String plate, String login) {
         User user = userRepository.getUser(login);

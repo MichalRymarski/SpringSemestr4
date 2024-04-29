@@ -1,6 +1,7 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.DeleteState;
 import org.example.authenticate.Authenticator;
 import org.example.dao.IUserRepository;
 import org.example.dto.CreateUserDto;
@@ -43,15 +44,15 @@ public class UserService {
 
         return userRepository.addUser(newUser);
     }
-    public String deleteUser(String login) {
+    public DeleteState deleteUser(String login) {
         User user = userRepository.getUser(login);
         if (user == null)
-            return "not found";
+            return DeleteState.NOT_FOUND;
         else if (user.getVehicle() != null)
-            return "vehicle is not null";
+            return DeleteState.RENTED;
         else
             userRepository.removeUser(login);
-        return "deleted";
+        return DeleteState.DELETED;
     }
 
 }

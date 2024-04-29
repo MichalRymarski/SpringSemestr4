@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.DeleteState;
 import org.example.dto.CreateUserDto;
 import org.example.dto.UserDto;
 import org.example.service.UserService;
@@ -17,7 +18,7 @@ import java.util.Collection;
 public class UserController {
 
 
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/all")
     public ResponseEntity<Collection<UserDto>> getUsers() {
@@ -48,16 +49,17 @@ public class UserController {
 
     @DeleteMapping("{login}")
     public ResponseEntity<?> deleteUser(@PathVariable String login) {
-        String result = userService.deleteUser(login);
+        DeleteState result = userService.deleteUser(login);
         switch (result) {
-            case "deleted":
-                return ResponseEntity.ok().body(result);
-            case "vehicle is not null":
-                return ResponseEntity.badRequest().body(result);
-            case "not found":
+            case NOT_FOUND -> {
                 return ResponseEntity.notFound().build();
-            default:
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+            }
+            case RENTED -> {
+                return ResponseEntity.badRequest().body(result);
+            }
+            default -> {
+                return ResponseEntity.ok().body(result);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package org.example.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.DeleteState;
 import org.example.dao.IVehicleRepository;
 import org.example.dto.VehicleDto;
 import org.example.model.Car;
@@ -27,7 +28,7 @@ public class VehicleService {
             int year = vehicle.getYear();
             double price = vehicle.getPrice();
             String plate = vehicle.getPlate();
-            boolean rent = false;
+            boolean rent = vehicle.isRent();
             String category = null;
             if (vehicle instanceof Motorcycle motorcycle) {
                 category = motorcycle.getCategory();
@@ -50,7 +51,7 @@ public class VehicleService {
     public VehicleDto getVehicle(String plate) {
         System.out.println("pass plate");
         Vehicle vehicle = vehicleRepository.getVehicle(plate);
-        if (vehicle != null && vehicle instanceof Motorcycle motorcycle) {
+        if (vehicle instanceof Motorcycle motorcycle) {
             return mapToVehicleDto(plate, motorcycle);
         } else if (vehicle != null) {
             return mapToVehicleDto(plate, vehicle);
@@ -66,7 +67,7 @@ public class VehicleService {
         int year = vehicle.getYear();
         double price = vehicle.getPrice();
         boolean rent = false;
-        VehicleDto vehicleDto = VehicleDto.builder()
+        return VehicleDto.builder()
             .brand(brand)
             .model(model)
             .year(year)
@@ -74,7 +75,6 @@ public class VehicleService {
             .plate(plate)
             .rent(rent)
             .build();
-        return vehicleDto;
     }
 
     private static VehicleDto mapToVehicleDto(final String plate, final Motorcycle motorcycle) {
@@ -84,7 +84,7 @@ public class VehicleService {
         double price = motorcycle.getPrice();
         boolean rent = false;
         String category = motorcycle.getCategory();
-        VehicleDto vehicleDto = VehicleDto.builder()
+        return VehicleDto.builder()
             .brand(brand)
             .model(model)
             .year(year)
@@ -93,10 +93,9 @@ public class VehicleService {
             .rent(rent)
             .category(category)
             .build();
-        return vehicleDto;
     }
 
-    public void createVehicle(final String brand,
+    public boolean createVehicle(final String brand,
                               final String model,
                               final int year,
                               final double price,
@@ -104,13 +103,13 @@ public class VehicleService {
         Car car = new Car(brand, model, year, price, plate);
         boolean success = vehicleRepository.addVehicle(car);
         if (success) {
-            System.out.println("DODANO POJAZD");
+            return true;
         } else {
-            System.out.println("NIE UDALO SIE DODAC POJAZDU");
+            return false;
         }
     }
 
-    public void createVehicle(final String brand,
+    public boolean createVehicle(final String brand,
                               final String model,
                               final int year,
                               final double price,
@@ -119,21 +118,22 @@ public class VehicleService {
         Motorcycle motorcycle = new Motorcycle(brand, model, year, price, plate, category);
         boolean success = vehicleRepository.addVehicle(motorcycle);
         if (success) {
-            System.out.println("DODANO POJAZD");
+            return true;
         } else {
-            System.out.println("NIE UDALO SIE DODAC POJAZDU");
+            return false;
         }
     }
 
-    public String deleteVehicle(String plate) {
+    public DeleteState deleteVehicle(String plate) {
         Vehicle vehicle = vehicleRepository.getVehicle(plate);
         if (vehicle == null) {
-            return "vehicle not found";
+            return DeleteState.NOT_FOUND;
         } else if (vehicle.isRent()) {
-            return "vehicle is rented cant delete";
+            return DeleteState.RENTED;
         } else {
             vehicleRepository.removeVehicle(plate);
         }
-        return "deleted";
+        return DeleteState.DELETED;
     }
+
 }

@@ -23,6 +23,36 @@ public class VehicleDAO implements IVehicleRepository {
         this.sessionFactory = sessionFactory;
     }
 
+    public boolean returnVehicle(String plate,String login) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            User user = session.get(User.class, login);
+            if (user.getVehicle() == null) {
+                return false;
+            }
+            Vehicle vehicle = user.getVehicle();
+
+            user.setVehicle(null);
+            vehicle.setUser(null);
+
+            vehicle.setRent(false);
+
+            session.update(user);
+            session.update(vehicle);
+            transaction.commit();
+            return true;
+        } catch (RuntimeException e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+
+    }
+
     @Override
     public boolean rentVehicle(String plate, String login) {
         Session session = sessionFactory.openSession();
@@ -40,7 +70,7 @@ public class VehicleDAO implements IVehicleRepository {
                 user.setVehicle(vehicle);
 
                 session.saveOrUpdate(user);
-                session.saveOrUpdate(vehicle);
+                session.update(vehicle);
 
                 transaction.commit();
                 return true;
@@ -57,7 +87,6 @@ public class VehicleDAO implements IVehicleRepository {
             session.close();
         }
     }
-
 
     @Override
     public boolean addVehicle(Vehicle vehicle) {
@@ -77,6 +106,7 @@ public class VehicleDAO implements IVehicleRepository {
         }
         return success;
     }
+
     @Override
     public boolean removeVehicle(String plate) {
         Session session = sessionFactory.openSession();
@@ -112,37 +142,7 @@ public class VehicleDAO implements IVehicleRepository {
             session.close();
         }
     }
-
     //Must implement old interface. Plate is no longer needed when User has Vehicle.
-    public boolean returnVehicle(String plate,String login) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            User user = session.get(User.class, login);
-            if (user.getVehicle() == null) {
-                return false;
-            }
-            Vehicle vehicle = user.getVehicle();
-
-            user.setVehicle(null);
-            vehicle.setUser(null);
-
-            vehicle.setRent(false);
-
-            session.update(user);
-            session.update(vehicle);
-            transaction.commit();
-            return true;
-        } catch (RuntimeException e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
-
-    }
 
     @Override
     public Collection<Vehicle> getVehicles() {
